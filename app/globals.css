@@ -1,26 +1,184 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light mode only, deliberately — don't let the browser dark-theme native
+     controls (scrollbars, form inputs) based on OS preference. */
+  color-scheme: light;
+
+  /* Warm coffee-brown surfaces — never neutral gray, never true black/white. */
+  --background: #f5eee6;
+  --surface: #fffbf5;
+  --border: #e3d5c4;
+  --foreground: #241a12;
+  --foreground-muted: #6b5946;
+
+  /* Rust — the only accent. Interactive elements only, never decoration. */
+  --accent: #b85618;
+  --accent-foreground: #fffbf5;
+
+  /* Reserved: green marks a winner and nothing else, red marks an error and
+     nothing else. */
+  --winner: #237a47;
+  --winner-foreground: #fffbf5;
+  --error: #c23b30;
+  --error-foreground: #fffbf5;
+
+  --font-display: "Fraunces", ui-serif, serif;
+  --font-body: "Public Sans", ui-sans-serif, sans-serif;
+  --font-metric: "Fragment Mono", ui-monospace, monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-foreground-muted: var(--foreground-muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-winner: var(--winner);
+  --color-winner-foreground: var(--winner-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-metric: var(--font-metric);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+/* Visible keyboard focus everywhere, in the accent — required baseline, not
+   decoration. Never rely on browser default outlines alone. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Markdown rendering for model answers (AnswerCard) — plain text otherwise
+   shows raw bold markers, headers, and pipe tables straight from the model. */
+.answer-markdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+}
+
+.answer-markdown > *:first-child {
+  margin-top: 0;
+}
+
+.answer-markdown h1,
+.answer-markdown h2,
+.answer-markdown h3,
+.answer-markdown h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.answer-markdown h1 {
+  font-size: 1.25em;
+}
+.answer-markdown h2 {
+  font-size: 1.15em;
+}
+.answer-markdown h3 {
+  font-size: 1.05em;
+}
+.answer-markdown h4 {
+  font-size: 1em;
+}
+
+.answer-markdown p {
+  margin: 0;
+}
+
+.answer-markdown ul,
+.answer-markdown ol {
+  margin: 0;
+  padding-left: 1.25em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.answer-markdown ul {
+  list-style-type: disc;
+}
+.answer-markdown ol {
+  list-style-type: decimal;
+}
+
+.answer-markdown a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.answer-markdown strong {
+  font-weight: 700;
+}
+
+.answer-markdown code {
+  font-family: var(--font-metric);
+  font-size: 0.9em;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.25em;
+  padding: 0.1em 0.35em;
+}
+
+.answer-markdown pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.5em;
+  padding: 0.75em;
+}
+
+.answer-markdown pre code {
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+.answer-markdown blockquote {
+  margin: 0;
+  padding-left: 0.75em;
+  border-left: 2px solid var(--border);
+  color: var(--foreground-muted);
+}
+
+.answer-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.answer-markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9em;
+  display: block;
+  overflow-x: auto;
+}
+
+.answer-markdown th,
+.answer-markdown td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+
+.answer-markdown th {
+  background: var(--background);
+  font-family: var(--font-metric);
+  font-weight: 500;
+  color: var(--foreground-muted);
 }

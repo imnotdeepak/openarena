@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Mirrors a Clerk user. Clerk owns identity; this table only exists so
+// Thread/Vote have something to key against. `id` is the Clerk user id.
+model User {
+  id        String   @id
+  createdAt DateTime @default(now())
+
+  threads Thread[]
+  votes   Vote[]
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  turns Turn[]
+}
+
+// One user prompt within a thread. Fans out to one Answer per selected model.
+model Turn {
+  id        String   @id @default(cuid())
+  prompt    String
+  createdAt DateTime @default(now())
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id])
+
+  answers Answer[]
+  vote    Vote?
+}
+
+enum AnswerStatus {
+  pending
+  streaming
+  done
+  failed
+}
+
+// One model's reply to one Turn. Created eagerly (status: pending) for every
+// model selected on the turn, so "which models were supposed to answer" is
+// always the set of Answer rows, not a separately stored list.
+model Answer {
+  id           String       @id @default(cuid())
+  model        String
+  status       AnswerStatus @default(pending)
+  content      String?
+  errorMessage String?
+  createdAt    DateTime     @default(now())
+
+  // Real, honestly-measured per-call numbers shown on the response card.
+  timeToFirstTokenMs Int?
+  tokensPerSecond    Float?
+  totalTokens        Int?
+
+  turnId String
+  turn   Turn   @relation(fields: [turnId], references: [id])
+
+  wonVote Vote?
+}
+
+// One vote per turn, only ever valid once 2+ Answers on that turn are `done`
+// (enforced in application code, not the DB). Points at the winning Answer.
+model Vote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  turnId String @unique
+  turn   Turn   @relation(fields: [turnId], references: [id])
+
+  winningAnswerId String @unique
+  winningAnswer   Answer @relation(fields: [winningAnswerId], references: [id])
+
+  voterId String
+  voter   User   @relation(fields: [voterId], references: [id])
+}
