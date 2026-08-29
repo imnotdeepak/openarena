@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenArena
 
-## Getting Started
+Send one prompt, watch up to three AI models answer at once, and vote for the best one. Real votes and real per-call numbers — time to first token, tokens per second, total tokens — build an honest leaderboard of which model is actually worth using.
 
-First, run the development server:
+## What it does
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Pick up to three models from OpenRouter's live free-tier catalog and send them the same prompt at once.
+- Each model streams its own answer independently — one being slow or down never blocks the others.
+- Once two or more models have answered, vote for the best one. That's one real vote, feeding a global and personal leaderboard.
+- Follow-ups continue each model's own separate conversation — no model ever sees another model's answers.
+- Every thread is shareable by link and viewable without an account; only sending a prompt and voting require sign-in, and only the thread's owner can do either.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Next.js (App Router) · TypeScript · Tailwind · Prisma + Postgres · Clerk (auth) · Arcjet (rate limiting, bot detection, prompt-injection protection) · PostHog (analytics) · the Vercel AI SDK + OpenRouter.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting started
 
-## Learn More
+1. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Copy `.env.example` to `.env.local` and fill in real values:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   cp .env.example .env.local
+   ```
 
-## Deploy on Vercel
+   You'll need keys for Clerk, OpenRouter, Arcjet, PostHog, and a Postgres connection string (`DATABASE_URL`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Apply the database schema:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. Run the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+| Command             | What it does              |
+| ------------------- | ------------------------- |
+| `npm run dev`       | Start the dev server      |
+| `npm run build`     | Production build          |
+| `npm run start`     | Run the production build  |
+| `npm run lint`      | ESLint                    |
+| `npm run format`    | Prettier, writes in place |
+| `npm run typecheck` | `tsc --noEmit`            |
+
+A pre-commit hook (Husky + lint-staged) runs formatting, linting, and a full typecheck automatically on every commit.
