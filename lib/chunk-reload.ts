@@ -18,20 +18,31 @@ export function isChunkLoadError(error: Error): boolean {
   );
 }
 
-// Reloads the page once for a chunk error and returns true when it does. The
-// cooldown stops a reload loop: if the reload does not fix the error within the
-// window, the boundary keeps its fallback visible instead of reloading again.
-export function reloadOnceForChunkError(error: Error): boolean {
-  if (typeof window === "undefined" || !isChunkLoadError(error)) {
-    return false;
-  }
-
+function isWithinCooldown(): boolean {
   const last = Number(window.sessionStorage.getItem(RELOAD_MARKER) ?? 0);
-  if (Date.now() - last < RELOAD_COOLDOWN_MS) {
-    return false;
+  return Date.now() - last < RELOAD_COOLDOWN_MS;
+}
+
+// True when a reload is the right response to this error and the cooldown does
+// not block it. A boundary reads this during render to show a quiet reloading
+// screen; when it is false the boundary must offer a real retry control, so a
+// chunk error that keeps failing does not strand the user on a spinner.
+export function willReloadForChunkError(error: Error): boolean {
+  return (
+    typeof window !== "undefined" &&
+    isChunkLoadError(error) &&
+    !isWithinCooldown()
+  );
+}
+
+// Reloads the page once for a chunk error. The cooldown stops a reload loop: if
+// the reload does not fix the error within the window, this does nothing and the
+// boundary falls back to its retry UI instead.
+export function reloadOnceForChunkError(error: Error): void {
+  if (!willReloadForChunkError(error)) {
+    return;
   }
 
   window.sessionStorage.setItem(RELOAD_MARKER, String(Date.now()));
   window.location.reload();
-  return true;
 }

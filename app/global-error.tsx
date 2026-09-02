@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { isChunkLoadError, reloadOnceForChunkError } from "@/lib/chunk-reload";
+import {
+  reloadOnceForChunkError,
+  willReloadForChunkError,
+} from "@/lib/chunk-reload";
 
 // The root catch-all. It also covers errors from the root layout — where
 // ClerkProvider wraps the whole tree — which the segment boundary cannot reach.
@@ -18,7 +21,7 @@ export default function GlobalError({
     reloadOnceForChunkError(error);
   }, [error]);
 
-  const quiet = isChunkLoadError(error);
+  const quiet = willReloadForChunkError(error);
 
   return (
     <html lang="en">

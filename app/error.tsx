@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { isChunkLoadError, reloadOnceForChunkError } from "@/lib/chunk-reload";
+import {
+  reloadOnceForChunkError,
+  willReloadForChunkError,
+} from "@/lib/chunk-reload";
 
 export default function Error({
   error,
@@ -14,9 +17,10 @@ export default function Error({
     reloadOnceForChunkError(error);
   }, [error]);
 
-  // A chunk error self-heals with a reload, so keep the screen quiet until the
-  // page comes back rather than flashing an error message.
-  if (isChunkLoadError(error)) {
+  // A reload is about to self-heal this, so keep the screen quiet until the page
+  // comes back rather than flashing an error message. Once the cooldown blocks
+  // further reloads, fall through to the retry UI below.
+  if (willReloadForChunkError(error)) {
     return (
       <div className="flex h-screen flex-1 items-center justify-center bg-background">
         <span className="font-metric text-sm tracking-wide text-foreground-muted">
