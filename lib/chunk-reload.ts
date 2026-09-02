@@ -18,19 +18,40 @@ export function isChunkLoadError(error: Error): boolean {
   );
 }
 
+// sessionStorage throws on any access when a browser blocks it (sandboxed
+// iframe, strict privacy settings). We need it to guard against a reload loop,
+// so probe once and treat a blocked store as "cannot reload" — never let the
+// probe throw out of the error boundary that is meant to be the last defense.
+let storageWorks: boolean | undefined;
+function canUseStorage(): boolean {
+  if (storageWorks === undefined) {
+    try {
+      const probe = "openarena:storage-probe";
+      window.sessionStorage.setItem(probe, "1");
+      window.sessionStorage.removeItem(probe);
+      storageWorks = true;
+    } catch {
+      storageWorks = false;
+    }
+  }
+  return storageWorks;
+}
+
 function isWithinCooldown(): boolean {
   const last = Number(window.sessionStorage.getItem(RELOAD_MARKER) ?? 0);
   return Date.now() - last < RELOAD_COOLDOWN_MS;
 }
 
-// True when a reload is the right response to this error and the cooldown does
-// not block it. A boundary reads this during render to show a quiet reloading
-// screen; when it is false the boundary must offer a real retry control, so a
-// chunk error that keeps failing does not strand the user on a spinner.
+// True when a reload is the right response to this error and nothing blocks it:
+// a chunk error, a usable store, and the cooldown clear. A boundary reads this
+// during render to show a quiet reloading screen; when it is false the boundary
+// must offer a real retry control, so a chunk error that keeps failing — or a
+// blocked store — does not strand the user on a spinner.
 export function willReloadForChunkError(error: Error): boolean {
   return (
     typeof window !== "undefined" &&
     isChunkLoadError(error) &&
+    canUseStorage() &&
     !isWithinCooldown()
   );
 }
