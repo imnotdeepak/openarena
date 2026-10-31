@@ -36,8 +36,8 @@ const HONEST_NUMBERS = [
 
 export default function Home() {
   return (
-    <div className="flex h-screen flex-1 snap-y snap-mandatory flex-col overflow-y-auto bg-background">
-      <section className="flex h-screen shrink-0 snap-start flex-col">
+    <div className="flex h-dvh snap-y snap-mandatory flex-col overflow-y-auto bg-background">
+      <section className="flex min-h-dvh shrink-0 snap-start flex-col">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-6">
           <span className="font-display text-lg font-medium text-foreground">
             OpenArena
@@ -86,7 +86,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex h-screen shrink-0 snap-start flex-col justify-center border-t border-border bg-surface px-6">
+      <section className="flex min-h-dvh shrink-0 snap-start flex-col justify-center border-t border-border bg-surface px-6">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-12">
           <h2 className="font-display text-4xl font-medium text-foreground sm:text-5xl">
             How it works
@@ -109,7 +109,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex h-screen shrink-0 snap-start flex-col justify-center border-t border-border px-6">
+      <section className="flex min-h-dvh shrink-0 snap-start flex-col justify-center border-t border-border px-6">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-12">
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-4xl font-medium text-foreground sm:text-5xl">
@@ -136,7 +136,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex h-screen shrink-0 snap-start flex-col justify-center border-t border-border bg-surface px-6">
+      <section className="flex min-h-dvh shrink-0 snap-start flex-col justify-center border-t border-border bg-surface px-6">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 text-center">
           <h2 className="font-display text-4xl font-medium text-foreground sm:text-5xl">
             See who&apos;s actually winning
